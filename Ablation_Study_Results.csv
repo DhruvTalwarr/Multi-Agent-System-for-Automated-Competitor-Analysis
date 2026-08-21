@@ -1,0 +1,6 @@
+Configuration,Contexts Found,Answer Completeness
+Full System (with Decomposition),2,"Complete 
+
+Tesla's 2026 Capex is $20B 
+BYD's 2025 Revenue is $116B"
+Ablated System (Raw Query Only),1,Incomplete

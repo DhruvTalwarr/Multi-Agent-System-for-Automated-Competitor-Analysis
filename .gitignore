@@ -1,0 +1,21 @@
+# Secrets and API Keys
+.env
+
+# Python caching
+__pycache__/
+*.py[cod]
+*$py.class
+
+# FAISS and Vector DB serialized artifacts
+faiss_index.index
+docs.pkl
+meta.pkl
+
+# Scraped cache data
+rag/data/market_data.json
+
+# IDE config files
+.idea/
+.vscode/
+venv/
+.venv/

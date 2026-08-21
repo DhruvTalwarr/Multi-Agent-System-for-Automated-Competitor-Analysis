@@ -1,0 +1,4 @@
+Metric,Clean Context,Noisy Context
+Latency (Seconds),1.496,0.167
+Token Usage,73,92
+Accuracy preserved?,Yes,Yes

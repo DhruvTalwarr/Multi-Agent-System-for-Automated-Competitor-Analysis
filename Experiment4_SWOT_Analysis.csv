@@ -1,0 +1,3 @@
+depth,actionability,grounding,reasoning,Company
+2,3,4,"The analysis lacks non-obvious market dynamics, but is supported by some facts and provides a basic foundation for decision-making.",BYD
+4,3,5,"The analysis identifies non-obvious market dynamics, such as the shift to real-time inference, and is grounded in retrieved facts like CUDA adoption and Groq's performance lead. However, actionability is limited by the lack of specific recommendations for NVIDIA.",NVIDIA
