@@ -85,13 +85,17 @@ def researcher_agent(state: AgentState):
     if DATA_FILE.exists():
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             local_content = f.read()
-            # If the current query company isn't in the file, we must scrape fresh data
-            if not has_query_evidence(query, local_content):
-                print(f"--- Architect: Stale data detected. Clearing cache for '{query}'... ---")
-                if DATA_FILE.exists(): os.remove(DATA_FILE)
-            else:
-                print(f"--- Architect: Relevant local context found. ---")
-                needs_update = False
+        
+        # Now that the file is closed, we can delete it safely on Windows
+        if not has_query_evidence(query, local_content):
+            print(f"--- Architect: Stale data detected. Clearing cache for '{query}'... ---")
+            try:
+                os.remove(DATA_FILE)
+            except Exception as e:
+                print(f"--- Architect: Warning: Could not delete stale file: {e} ---")
+        else:
+            print(f"--- Architect: Relevant local context found. ---")
+            needs_update = False
 
     if needs_update:
         print(f"--- Architect: Triggering LIVE SCRAPE for '{query}'... ---")
