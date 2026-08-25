@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SBDA — Smart Business Decision Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #09090b;
+      --bg-2:     #111113;
+      --bg-card:  rgba(255,255,255,0.035);
+      --border:   rgba(255,255,255,0.08);
+      --border-h: rgba(255,255,255,0.15);
+      --text:     #fafafa;
+      --muted:    #a1a1aa;
+      --accent:   #22d3ee;        /* cyan-400 */
+      --accent-2: #818cf8;        /* indigo-400 */
+      --green:    #4ade80;
+      --radius:   12px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ───── NOISE OVERLAY ───── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ───── GRADIENT BLOBS ───── */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: .25;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 { width: 600px; height: 600px; background: #0ea5e9; top: -200px; left: -150px; }
+    .blob-2 { width: 500px; height: 500px; background: #8b5cf6; bottom: -150px; right: -100px; }
+    .blob-3 { width: 300px; height: 300px; background: #22d3ee; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+
+    /* ───── NAV ───── */
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 40px;
+      background: rgba(9,9,11,0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em;
+    }
+    .nav-logo .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 12px var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: .875rem;
+      font-weight: 500; transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #09090b; font-weight: 600; font-size: .875rem;
+      font-family: inherit; transition: opacity .2s, transform .1s;
+    }
+    .nav-cta:hover { opacity: .9; transform: translateY(-1px); }
+
+    /* ───── HERO ───── */
+    #hero {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; padding: 100px 24px 80px;
+    }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; border-radius: 100px;
+      border: 1px solid rgba(34,211,238,0.3);
+      background: rgba(34,211,238,0.07);
+      color: var(--accent); font-size: .78rem; font-weight: 600;
+      margin-bottom: 28px; letter-spacing: 0.04em;
+    }
+    .badge svg { width: 12px; height: 12px; }
+
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900; letter-spacing: -0.04em; line-height: 1.05;
+      max-width: 850px; margin-bottom: 24px;
+    }
+    h1 .grad {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 60%, #f472b6 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      color: var(--muted); font-size: 1.1rem; max-width: 580px;
+      line-height: 1.7; margin-bottom: 48px;
+    }
+
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 26px; border-radius: 9px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #09090b; font-weight: 700; font-size: .95rem; font-family: inherit;
+      transition: all .2s; box-shadow: 0 0 30px rgba(34,211,238,.25);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(34,211,238,.4); }
+
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 26px; border-radius: 9px; cursor: pointer;
+      background: transparent; color: var(--text); font-family: inherit;
+      font-weight: 600; font-size: .95rem;
+      border: 1px solid var(--border-h); transition: all .2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    /* ───── STATS BAR ───── */
+    .stats-bar {
+      display: flex; justify-content: center; gap: 0;
+      flex-wrap: wrap; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg-card);
+      backdrop-filter: blur(12px); overflow: hidden;
+      margin: 60px auto 0; max-width: 780px;
+    }
+    .stat {
+      flex: 1 1 180px; padding: 24px 28px;
+      border-right: 1px solid var(--border); text-align: center;
+    }
+    .stat:last-child { border-right: none; }
+    .stat-val { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.03em; }
+    .stat-val.c1 { color: var(--accent); }
+    .stat-val.c2 { color: var(--accent-2); }
+    .stat-val.c3 { color: var(--green); }
+    .stat-val.c4 { color: #f472b6; }
+    .stat-label { font-size: .78rem; color: var(--muted); margin-top: 4px; font-weight: 500; }
+
+    /* ───── SECTION ───── */
+    section {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto;
+      padding: 80px 24px;
+    }
+    .section-label {
+      font-size: .78rem; font-weight: 600; letter-spacing: .08em;
+      color: var(--accent); text-transform: uppercase; margin-bottom: 12px;
+    }
+    h2 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800;
+      letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 14px;
+    }
+    h2 .grad { background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .sub { color: var(--muted); font-size: 1rem; max-width: 540px; line-height: 1.7; margin-bottom: 48px; }
+
+    /* ───── FEATURE CARDS ───── */
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px;
+      transition: border-color .2s, transform .2s;
+      backdrop-filter: blur(8px);
+    }
+    .card:hover { border-color: var(--border-h); transform: translateY(-3px); }
+
+    .card-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin-bottom: 16px;
+    }
+    .card-icon.cyan  { background: rgba(34,211,238,0.12); }
+    .card-icon.ind   { background: rgba(129,140,248,0.12); }
+    .card-icon.pink  { background: rgba(244,114,182,0.12); }
+    .card-icon.green { background: rgba(74,222,128,0.12); }
+    .card-icon.orange{ background: rgba(251,146,60,0.12); }
+    .card-icon.violet{ background: rgba(167,139,250,0.12); }
+
+    .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .card p  { font-size: .875rem; color: var(--muted); line-height: 1.65; }
+
+    /* ───── AGENT PIPELINE ───── */
+    .pipeline {
+      display: flex; flex-direction: column; gap: 0;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; background: var(--bg-card); backdrop-filter: blur(8px);
+    }
+    .pipeline-step {
+      display: flex; align-items: flex-start; gap: 20px;
+      padding: 24px 28px; border-bottom: 1px solid var(--border);
+      transition: background .2s;
+    }
+    .pipeline-step:last-child { border-bottom: none; }
+    .pipeline-step:hover { background: rgba(255,255,255,.03); }
+    .step-num {
+      min-width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; font-weight: 700;
+    }
+    .s1 { background: rgba(34,211,238,.15); color: var(--accent); }
+    .s2 { background: rgba(129,140,248,.15); color: var(--accent-2); }
+    .s3 { background: rgba(74,222,128,.15); color: var(--green); }
+    .s4 { background: rgba(244,114,182,.15); color: #f472b6; }
+    .step-content h4 { font-size: .95rem; font-weight: 700; margin-bottom: 4px; }
+    .step-content p  { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+    .step-badge {
+      margin-top: 8px; display: inline-block; padding: 3px 9px;
+      border-radius: 100px; font-size: .72rem; font-weight: 600;
+    }
+    .sb-cyan  { background: rgba(34,211,238,.12); color: var(--accent); border: 1px solid rgba(34,211,238,.25); }
+    .sb-ind   { background: rgba(129,140,248,.12); color: var(--accent-2); border: 1px solid rgba(129,140,248,.25); }
+    .sb-green { background: rgba(74,222,128,.12); color: var(--green); border: 1px solid rgba(74,222,128,.25); }
+    .sb-pink  { background: rgba(244,114,182,.12); color: #f472b6; border: 1px solid rgba(244,114,182,.25); }
+
+    /* ───── QUERY INTERFACE (THE MAIN WIDGET) ───── */
+    #analyze {
+      background: var(--bg-2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 80px 24px;
+    }
+    .analyze-inner {
+      max-width: 860px; margin: 0 auto;
+    }
+    .query-box {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 6px; backdrop-filter: blur(12px);
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .query-box:focus-within {
+      border-color: rgba(34,211,238,.5);
+      box-shadow: 0 0 0 3px rgba(34,211,238,.08);
+    }
+    .query-top {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    }
+    .query-top span { font-size: .8rem; color: var(--muted); font-weight: 500; white-space: nowrap; }
+
+    #query-input {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: var(--text); font-family: inherit; font-size: .95rem;
+      resize: none; min-height: 80px; padding: 10px 12px;
+      line-height: 1.6;
+    }
+    #query-input::placeholder { color: rgba(161,161,170,.5); }
+
+    .query-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-top: 1px solid var(--border);
+    }
+    .query-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .qtag {
+      padding: 4px 10px; border-radius: 6px; font-size: .75rem; font-weight: 600;
+      cursor: pointer; border: 1px solid var(--border); color: var(--muted);
+      background: transparent; font-family: inherit; transition: all .15s;
+    }
+    .qtag:hover { border-color: var(--accent); color: var(--accent); background: rgba(34,211,238,.05); }
+
+    .analyze-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 22px; border-radius: 8px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #09090b; font-weight: 700; font-size: .875rem;
+      font-family: inherit; transition: all .2s; white-space: nowrap;
+    }
+    .analyze-btn:hover { opacity: .9; transform: translateY(-1px); }
+    .analyze-btn:disabled {
+      opacity: .5; cursor: not-allowed; transform: none;
+    }
+    .analyze-btn svg { width: 16px; height: 16px; }
+
+    /* ───── RESPONSE AREA ───── */
+    #response-area {
+      display: none; margin-top: 24px;
+      border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+      background: var(--bg-card); backdrop-filter: blur(8px);
+    }
+    #response-area.visible { display: block; }
+
+    .response-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.02);
+    }
+    .response-header-left {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .live-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--green);
+      box-shadow: 0 0 8px var(--green); animation: pulse 1.5s infinite;
+    }
+    .response-header h4 { font-size: .875rem; font-weight: 700; }
+    .response-meta { font-size: .78rem; color: var(--muted); }
+
+    .copy-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); cursor: pointer;
+      font-family: inherit; font-size: .78rem; font-weight: 500; transition: all .15s;
+    }
+    .copy-btn:hover { border-color: var(--border-h); color: var(--text); }
+
+    #response-body {
+      padding: 24px; max-height: 600px; overflow-y: auto; line-height: 1.75;
+    }
+    #response-body h1, #response-body h2, #response-body h3 {
+      color: var(--text); margin-top: 20px; margin-bottom: 8px; font-weight: 700;
+    }
+    #response-body h2 { font-size: 1.1rem; color: var(--accent); }
+    #response-body h3 { font-size: .95rem; }
+    #response-body p { color: var(--muted); margin-bottom: 12px; font-size: .9rem; }
+    #response-body strong { color: var(--text); font-weight: 600; }
+    #response-body ul, #response-body ol { color: var(--muted); padding-left: 20px; margin-bottom: 12px; }
+    #response-body li { margin-bottom: 4px; font-size: .9rem; }
+    #response-body table {
+      width: 100%; border-collapse: collapse; font-size: .85rem;
+      margin: 16px 0; border-radius: 8px; overflow: hidden;
+    }
+    #response-body th {
+      background: rgba(34,211,238,.08); color: var(--accent); font-weight: 700;
+      padding: 10px 14px; text-align: left; border: 1px solid var(--border);
+    }
+    #response-body td {
+      padding: 9px 14px; border: 1px solid var(--border); color: var(--muted);
+    }
+    #response-body tr:hover td { background: rgba(255,255,255,.02); }
+    #response-body code {
+      background: rgba(255,255,255,.07); padding: 2px 6px; border-radius: 4px;
+      font-size: .85em; color: var(--accent);
+    }
+
+    /* ───── LOADER ───── */
+    #loader {
+      display: none; flex-direction: column; align-items: center; gap: 16px;
+      padding: 40px; text-align: center;
+    }
+    #loader.visible { display: flex; }
+    .spinner {
+      width: 48px; height: 48px; border-radius: 50%;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-steps { display: flex; flex-direction: column; gap: 8px; min-width: 280px; }
+    .loader-step {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 14px; border-radius: 8px;
+      background: rgba(255,255,255,.03); border: 1px solid var(--border);
+      font-size: .82rem; color: var(--muted); transition: all .3s;
+    }
+    .loader-step.active { border-color: rgba(34,211,238,.3); color: var(--accent); background: rgba(34,211,238,.05); }
+    .loader-step.done   { border-color: rgba(74,222,128,.3); color: var(--green); background: rgba(74,222,128,.05); }
+    .step-icon { font-size: 1rem; }
+
+    /* ───── ERROR ───── */
+    #error-box {
+      display: none; margin-top: 16px; padding: 16px 20px;
+      border-radius: 10px; background: rgba(248,113,113,.08);
+      border: 1px solid rgba(248,113,113,.3); color: #f87171; font-size: .875rem;
+    }
+    #error-box.visible { display: block; }
+
+    /* ───── METRICS ───── */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 48px; }
+    .metric-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 22px; backdrop-filter: blur(8px);
+    }
+    .metric-card .m-label { font-size: .75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .metric-card .m-val { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .metric-card .m-sub  { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+
+    /* ───── FOOTER ───── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 40px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; color: var(--muted); font-size: .825rem;
+    }
+    footer a { color: var(--muted); text-decoration: none; transition: color .2s; }
+    footer a:hover { color: var(--text); }
+    .footer-links { display: flex; gap: 20px; }
+
+    /* ───── SCROLLBAR ───── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-h); border-radius: 10px; }
+
+    /* ───── RESPONSIVE ───── */
+    @media (max-width: 640px) {
+      nav { padding: 12px 20px; }
+      .nav-links { display: none; }
+      #hero { padding: 72px 20px 56px; }
+      .stats-bar { flex-direction: column; }
+      .stat { border-right: none; border-bottom: 1px solid var(--border); }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background blobs -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<!-- ─────────────── NAV ─────────────── -->
+<nav>
+  <div class="nav-logo">
+    <div class="dot"></div>
+    SBDA
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How it Works</a>
+    <a href="#analyze">Try It</a>
+    <a href="#metrics">Metrics</a>
+  </div>
+  <button class="nav-cta" onclick="document.getElementById('analyze').scrollIntoView({behavior:'smooth'})">
+    ⚡ Try Now
+  </button>
+</nav>
+
+<!-- ─────────────── HERO ─────────────── -->
+<div id="hero">
+  <div class="badge">
+    <svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" fill="currentColor"/></svg>
+    Agentic AI · Multi-Agent Architecture · RAG Pipeline
+  </div>
+
+  <h1>
+    Smarter Business Decisions with <span class="grad">Agentic AI</span>
+  </h1>
+
+  <p class="hero-sub">
+    A real-time multi-agent system that scrapes live market data, fetches financial metrics, and generates comprehensive SWOT analysis and competitor intelligence reports — in seconds.
+  </p>
+
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="document.getElementById('analyze').scrollIntoView({behavior:'smooth'})">
+      ⚡ Run Analysis
+    </button>
+    <a href="https://github.com/DhruvTalwarr/Agentic-AI-Framework-for-Smart-Business-Decision-Making" target="_blank" class="btn-secondary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.6.5.5 5.6.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.4-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.7 2.6 1.2 3.2.9.1-.7.4-1.2.7-1.5-2.5-.3-5.2-1.3-5.2-5.7 0-1.3.4-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.4 11.4 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.7.8 1.2 1.9 1.2 3.1 0 4.4-2.7 5.4-5.2 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.9 7.9-10.9C23.5 5.6 18.4.5 12 .5z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-val c1">85%</div>
+      <div class="stat-label">Avg Precision Score</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val c2">4</div>
+      <div class="stat-label">Specialized AI Agents</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val c3">Live</div>
+      <div class="stat-label">Web Scrape + Finance API</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val c4">SWOT</div>
+      <div class="stat-label">Strategic Report Output</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── FEATURES ─────────────── -->
+<section id="features">
+  <div class="section-label">Capabilities</div>
+  <h2>Every Layer of <span class="grad">Intelligence</span></h2>
+  <p class="sub">From real-time scraping to structured insight generation, each component is engineered for accuracy, relevance, and speed.</p>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-icon cyan">🔍</div>
+      <h3>Live Web Intelligence</h3>
+      <p>Automatically scrapes Google News RSS, strips boilerplate, and indexes fresh articles into a FAISS vector store in real-time per query.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon ind">📈</div>
+      <h3>Financial API Integration</h3>
+      <p>Smart ticker discovery via <code>yfinance</code> — fetches Market Cap, Revenue, P/E ratio, Debt-to-Equity, and 52-week high for any public company globally.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon pink">🧠</div>
+      <h3>Hybrid-Search RAG</h3>
+      <p>Combines FAISS semantic similarity (50%), BM25 lexical overlap (25%), source credibility (15%), and document recency (10%) for optimal retrieval.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon green">🛡️</div>
+      <h3>Critic Quality Gate</h3>
+      <p>An independent AI critic inspects every generated report for hallucinations, missing companies, and formatting requirements. Rejects and re-runs if needed.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon orange">⚡</div>
+      <h3>LangGraph Orchestration</h3>
+      <p>Built on LangGraph state machines with conditional routing — the 4-agent pipeline loops intelligently until the report passes quality checks.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon violet">📊</div>
+      <h3>Dual Report Modes</h3>
+      <p>Automatically selects persona based on query intent: <em>Senior Equity Research Analyst</em> for financial queries or <em>Strategic Business Consultant</em> for SWOT.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── HOW IT WORKS ─────────────── -->
+<section id="how-it-works" style="padding-top: 0">
+  <div class="section-label">Architecture</div>
+  <h2>The <span class="grad">4-Agent</span> Pipeline</h2>
+  <p class="sub">Each query flows through a stateful LangGraph orchestration, where agents collaborate and self-correct to produce enterprise-grade output.</p>
+
+  <div class="pipeline">
+    <div class="pipeline-step">
+      <div class="step-num s1">01</div>
+      <div class="step-content">
+        <h4>🗺️ Planner Agent</h4>
+        <p>Classifies query intent and domain (EV, smartphone, finance, startup). Generates 3–6 retrieval-optimized sub-queries to guide downstream research.</p>
+        <span class="step-badge sb-cyan">LLM · openai/gpt-oss-20b</span>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num s2">02</div>
+      <div class="step-content">
+        <h4>🔬 Researcher Agent</h4>
+        <p>Detects stale context and clears it. Triggers a live scrape via Google News RSS if no relevant data exists. Concurrently fetches real-time financial metrics via yfinance smart ticker discovery.</p>
+        <span class="step-badge sb-ind">FAISS + yfinance + RSS Scraper</span>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num s3">03</div>
+      <div class="step-content">
+        <h4>📝 Report Generator Agent</h4>
+        <p>Selects a persona and synthesizes structured output — either a financial comparison table with markdown or a deep SWOT analysis with strategic recommendations.</p>
+        <span class="step-badge sb-green">LLM · openai/gpt-oss-120b</span>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num s4">04</div>
+      <div class="step-content">
+        <h4>🛡️ Critic Agent (Quality Gate)</h4>
+        <p>Validates report relevance by checking for requested company names, table presence in financial queries, and absence of hallucinated defaults. Loops back to Researcher if criteria fail (max 2 retries).</p>
+        <span class="step-badge sb-pink">Rule-based + Keyword Matching</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── QUERY INTERFACE ─────────────── -->
+<div id="analyze">
+  <div class="analyze-inner">
+    <div style="text-align:center; margin-bottom: 40px;">
+      <div class="section-label" style="justify-content: center; display: flex;">Live Query</div>
+      <h2 style="justify-content: center;">Run a Business <span class="grad">Analysis</span></h2>
+      <p class="sub" style="margin: 14px auto 0; max-width: 520px;">
+        Ask about any public company, market segment, or product comparison. The agent will scrape live data, fetch financial metrics, and generate a structured report.
+      </p>
+    </div>
+
+    <div class="query-box">
+      <div class="query-top">
+        <span>Query →</span>
+      </div>
+      <textarea
+        id="query-input"
+        placeholder="e.g. Compare the 2026 revenue, market cap, and strategic positioning of Tesla vs BYD."
+        rows="4"
+      ></textarea>
+      <div class="query-footer">
+        <div class="query-tags">
+          <button class="qtag" onclick="setQuery('Perform a SWOT analysis for NVIDIA in the AI Inference hardware sector for 2026.')">SWOT · NVIDIA</button>
+          <button class="qtag" onclick="setQuery('Compare the 2025 revenue, market cap, and valuation of Tesla vs BYD.')">Financial · Tesla vs BYD</button>
+          <button class="qtag" onclick="setQuery('Analyze Google Android XR smart glasses vs Apple Project N50 — features, partners, and positioning.')">Smart Glasses</button>
+          <button class="qtag" onclick="setQuery('What are the strengths and weaknesses of Rivian in the 2026 EV market?')">Rivian EV</button>
+        </div>
+        <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          Analyze
+        </button>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="error-box"></div>
+
+    <!-- Loader -->
+    <div id="response-area">
+      <div id="loader">
+        <div class="spinner"></div>
+        <div class="loader-steps">
+          <div class="loader-step" id="ls1"><span class="step-icon">🗺️</span> Planner Agent — classifying intent…</div>
+          <div class="loader-step" id="ls2"><span class="step-icon">🌐</span> Researcher — scraping live web data…</div>
+          <div class="loader-step" id="ls3"><span class="step-icon">📈</span> Fetching financial metrics…</div>
+          <div class="loader-step" id="ls4"><span class="step-icon">📝</span> Report Generator — synthesizing output…</div>
+          <div class="loader-step" id="ls5"><span class="step-icon">🛡️</span> Critic Agent — validating quality…</div>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div id="result-view" style="display:none;">
+        <div class="response-header">
+          <div class="response-header-left">
+            <div class="live-dot"></div>
+            <h4>Analysis Report</h4>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="response-meta" id="iter-badge"></span>
+            <button class="copy-btn" onclick="copyReport()">
+              📋 Copy
+            </button>
+          </div>
+        </div>
+        <div id="response-body"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── METRICS ─────────────── -->
+<section id="metrics">
+  <div class="section-label">Evaluation</div>
+  <h2>Experimental <span class="grad">Results</span></h2>
+  <p class="sub">Rigorously tested across five experiments against gold-standard competitor datasets and qualitative SWOT rubrics.</p>
+
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="m-label">Avg Precision</div>
+      <div class="m-val" style="color: var(--accent);">85%</div>
+      <div class="m-sub">Competitor Identification · Exp 3</div>
+    </div>
+    <div class="metric-card">
+      <div class="m-label">Avg Recall</div>
+      <div class="m-val" style="color: var(--accent-2);">58%</div>
+      <div class="m-sub">Tesla, NVIDIA, Apple Smart Glasses</div>
+    </div>
+    <div class="metric-card">
+      <div class="m-label">Avg F1-Score</div>
+      <div class="m-val" style="color: var(--green);">69%</div>
+      <div class="m-sub">Harmonic mean across test targets</div>
+    </div>
+    <div class="metric-card">
+      <div class="m-label">Context Recall</div>
+      <div class="m-val" style="color: #f472b6;">100%</div>
+      <div class="m-sub">RAG standard queries · Exp 1</div>
+    </div>
+    <div class="metric-card">
+      <div class="m-label">Noise Robustness</div>
+      <div class="m-val" style="color: var(--accent);">✓ Yes</div>
+      <div class="m-sub">Accuracy preserved under noisy context</div>
+    </div>
+    <div class="metric-card">
+      <div class="m-label">SWOT Grounding</div>
+      <div class="m-val" style="color: var(--accent-2);">5 / 5</div>
+      <div class="m-sub">NVIDIA · Judge-evaluated · Exp 4</div>
+    </div>
+    <div class="metric-card">
+      <div class="m-label">Ablation Study</div>
+      <div class="m-val" style="color: var(--green);">+100%</div>
+      <div class="m-sub">Completeness gain from decomposition</div>
+    </div>
+    <div class="metric-card">
+      <div class="m-label">Agent Loops</div>
+      <div class="m-val" style="color: #f472b6);">≤ 2</div>
+      <div class="m-sub">Max revisions before forced output</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── FOOTER ─────────────── -->
+<footer>
+  <div class="nav-logo" style="font-size:1rem;">
+    <div class="dot"></div>
+    SBDA — Smart Business Decision Assistant
+  </div>
+  <div class="footer-links">
+    <a href="https://github.com/DhruvTalwarr/Agentic-AI-Framework-for-Smart-Business-Decision-Making" target="_blank">GitHub</a>
+    <a href="http://127.0.0.1:8001/docs" target="_blank">API Docs</a>
+    <a href="#analyze">Try Now</a>
+  </div>
+  <span style="color: var(--border-h);">Built with LangGraph · Groq · FAISS · FastAPI</span>
+</footer>
+
+<script>
+  // ── Config ──────────────────────────────────────────────────
+  const API_URL = 'http://127.0.0.1:8001/analyze';
+
+  // ── Quick-fill tags ──────────────────────────────────────────
+  function setQuery(text) {
+    document.getElementById('query-input').value = text;
+    document.getElementById('query-input').focus();
+  }
+
+  // ── Loader animation helper ──────────────────────────────────
+  let loaderTimer = null;
+  const STEPS = ['ls1', 'ls2', 'ls3', 'ls4', 'ls5'];
+
+  function startLoader() {
+    const steps = STEPS.map(id => document.getElementById(id));
+    steps.forEach(s => s.classList.remove('active', 'done'));
+
+    let i = 0;
+    loaderTimer = setInterval(() => {
+      if (i > 0) steps[i - 1].classList.replace('active', 'done');
+      if (i < steps.length) { steps[i].classList.add('active'); i++; }
+    }, 700);
+  }
+
+  function stopLoader() {
+    clearInterval(loaderTimer);
+    STEPS.forEach(id => document.getElementById(id).classList.remove('active'));
+    STEPS.forEach(id => document.getElementById(id).classList.add('done'));
+  }
+
+  // ── Main analysis ────────────────────────────────────────────
+  async function runAnalysis() {
+    const query = document.getElementById('query-input').value.trim();
+    if (!query) {
+      showError('Please enter a query before running analysis.');
+      return;
+    }
+
+    // Reset UI
+    hideError();
+    document.getElementById('result-view').style.display = 'none';
+    document.getElementById('response-body').innerHTML = '';
+
+    const responseArea = document.getElementById('response-area');
+    const loader = document.getElementById('loader');
+    const btn = document.getElementById('analyze-btn');
+
+    responseArea.classList.add('visible');
+    loader.classList.add('visible');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;margin:0;"></div> Analyzing…';
+
+    startLoader();
+    const t0 = Date.now();
+
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: query })
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(`Server returned ${res.status}: ${err}`);
+      }
+
+      const data = await res.json();
+      const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+
+      stopLoader();
+      loader.classList.remove('visible');
+
+      // Render markdown
+      document.getElementById('response-body').innerHTML = marked.parse(data.report || '*(No report returned)*');
+      document.getElementById('iter-badge').textContent = `${data.iterations || '?'} agent loop${(data.iterations || 0) !== 1 ? 's' : ''} · ${elapsed}s`;
+
+      document.getElementById('result-view').style.display = 'block';
+
+    } catch (err) {
+      stopLoader();
+      loader.classList.remove('visible');
+      responseArea.classList.remove('visible');
+
+      let msg = err.message;
+      if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+        msg = '⚠️ Cannot reach the backend server at <strong>http://127.0.0.1:8001</strong>. Make sure the FastAPI server is running:<br><code>python -m uvicorn main:app --host 127.0.0.1 --port 8001</code>';
+      }
+      showError(msg);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg> Analyze';
+    }
+  }
+
+  function showError(msg) {
+    const box = document.getElementById('error-box');
+    box.innerHTML = msg;
+    box.classList.add('visible');
+  }
+  function hideError() {
+    document.getElementById('error-box').classList.remove('visible');
+  }
+
+  async function copyReport() {
+    const text = document.getElementById('response-body').innerText;
+    try {
+      await navigator.clipboard.writeText(text);
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = '✅ Copied!';
+      setTimeout(() => btn.textContent = '📋 Copy', 1800);
+    } catch { }
+  }
+
+  // Allow Ctrl+Enter to submit
+  document.getElementById('query-input').addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key === 'Enter') runAnalysis();
+  });
+</script>
+</body>
+</html>
