@@ -5,8 +5,8 @@ from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 load_dotenv()
 
-# Using Llama 3.3 70B - a top-tier model for reasoning
-llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.7)
+# Using OpenAI GPT-OSS 120B - a top-tier model for reasoning
+llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0.7)
 
 try:
     response = llm.invoke("Hello, are you working on Groq?")

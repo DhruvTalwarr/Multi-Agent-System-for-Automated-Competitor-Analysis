@@ -25,7 +25,7 @@ def run_performance_test(case, use_noise=False):
     
     start_time = time.time()
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[{"role": "user", "content": prompt}]
     )
     end_time = time.time()

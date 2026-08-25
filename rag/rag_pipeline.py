@@ -19,7 +19,7 @@ class RAGPipeline:
         self.retriever = Retriever()
         # Initialize Groq via LangChain
         self.llm = ChatGroq(
-            model="llama-3.3-70b-versatile", 
+            model="openai/gpt-oss-120b", 
             temperature=0.5,
             groq_api_key=os.getenv("GROQ_API_KEY")
         )

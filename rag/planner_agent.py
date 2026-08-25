@@ -205,7 +205,7 @@ class PlannerAgent:
     def __init__(self):
         # Initializing Groq instead of Gemini
         self.llm = ChatGroq(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-20b",
             temperature=0.2, # Lower temperature for consistent JSON structure
             groq_api_key=os.getenv("GROQ_API_KEY")
         )

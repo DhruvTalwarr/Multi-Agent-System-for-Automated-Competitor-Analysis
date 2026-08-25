@@ -33,8 +33,8 @@ df = pd.DataFrame(eval_data)
 dataset = Dataset.from_dict(df)
 
 # 3. THE MODELS: Wrapping Langchain for Ragas
-# We use llama-3.3-70b-versatile as it's the current active model
-llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
+# We use openai/gpt-oss-120b as it's the current active model
+llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0)
 evaluator_llm = LangchainLLMWrapper(llm)
 
 # Fix for Embeddings (HuggingFace avoids OpenAI Key requirement)
