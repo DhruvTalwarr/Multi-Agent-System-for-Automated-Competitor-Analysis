@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OmniSight Analytics — Market Intelligence</title>
+  <meta name="description" content="OmniSight Analytics turns business queries and market data into structured agentic reports.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=block" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    :root {
+      --u: min(0.06410256vw, 0.12400794vh);
+      --vu: 0.09920635vh;
+      --inset-top: 41;
+      --inset-bottom: 106;
+
+      /* Nav */
+      --brand-x: 225; --brand-y: 45; --mark: 34; --brand-gap: 12; --brand-fs: 18.49;
+      --cta-x: 1195; --cta-y: 42; --cta-w: 140; --cta-h: 43; --cta-r: 12; --cta-fs: 15.70; --cta-dy: 2;
+
+      /* Hero */
+      --hero-gap: 51;
+      --h1-y: 323; --h1-fs: 36.25; --display-ls: 0.0018em;
+      --brand-ls: -0.0154em; --cta-ls: -0.0127em; --body-ls: 0.007em;
+      --label-ls: normal; --proof-ls: 0.0065em;
+      --w-regular: 400; --w-display-wght: 410; --w-medium: 500; --w-semibold: 600;
+      --w-display: var(--w-display-wght); --w-brand: 500; --w-cta: 520;
+      --w-body: var(--w-regular); --w-label: var(--w-medium);
+      --w-proof: 480;
+
+      /* Composer */
+      --card-x: 425; --card-y: 413; --card-w: 708; --card-h: 143; --card-r: 26;
+      --ph-x: 452; --ph-y: 446; --ph-fs: 9.97;
+      --chips-x: 444; --chips-y: 505; --chip-h: 30; --chip-r: 9; --chip-fs: 9.0; --chip-gap: 5.5;
+      --att-x: 1043.2; --att-y: 515.1;
+      --send-x: 1084; --send-y: 507; --send-d: 35;
+
+      /* Footer */
+      --by-y: 799; --by-fs: 14.01; --logo-y: 867; --logo-gap: 62;
+
+      /* Fonts & Easing */
+      --font-text: 'Inter', -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-display: 'Inter', var(--font-text);
+      --e-primary: cubic-bezier(.16, 1, .3, 1);
+      --e-soft: cubic-bezier(.22, 1, .36, 1);
+    }
+
+    @supports (height: 100dvh) {
+      :root {
+        --u: min(0.06410256vw, 0.12400794dvh);
+        --vu: 0.09920635dvh;
+      }
+    }
+    @media (min-width: 1561px) {
+      :root { --inset-top: 27; --inset-bottom: 74; }
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    button, input, textarea {
+      font: inherit;
+      color: inherit;
+      background: none;
+      border: 0;
+    }
+
+    img, svg { display: block; }
+    a { text-decoration: none; color: inherit; }
+    
+    :focus-visible {
+      outline: 2px solid #F8B285;
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    html, body {
+      height: 100%;
+      background: #0a0d12;
+      font-family: var(--font-text);
+      color: #fff;
+      font-synthesis: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: geometricPrecision;
+      overflow: hidden;
+    }
+
+    /* Core Layout */
+    .stage {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background: #0a0d12;
+    }
+
+    .stage-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .frame {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      padding: calc(var(--inset-top) * var(--vu)) calc(225 * var(--u)) calc(var(--inset-bottom) * var(--vu));
+    }
+
+    /* Nav & Large Brand Logo */
+    .nav {
+      height: calc(110 * var(--u));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .brand img {
+      height: calc(130 * var(--u));
+      width: auto;
+      display: block;
+      object-fit: contain;
+      mix-blend-mode: screen;
+      filter: drop-shadow(0 calc(4 * var(--u)) calc(16 * var(--u)) rgba(0, 0, 0, 0.5));
+    }
+
+    .cta {
+      width: calc(var(--cta-w) * var(--u));
+      height: calc(var(--cta-h) * var(--u));
+      border-radius: calc(var(--cta-r) * var(--u));
+      font-size: calc(var(--cta-fs) * var(--u));
+      font-weight: var(--w-cta);
+      letter-spacing: var(--cta-ls);
+      align-self: center;
+      background: linear-gradient(180deg, #3d3d3f 0%, #1d1d20 100%);
+      box-shadow: inset 0 calc(1 * var(--u)) 0 rgba(255,255,255,.10), 0 calc(2 * var(--u)) calc(14 * var(--u)) rgba(0,0,0,.28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: filter 0.1s ease, transform 0.1s ease;
+    }
+
+    .cta span { transform: translateY(calc(var(--cta-dy) * var(--u))); }
+    .cta:hover { filter: brightness(1.16); }
+    .cta:active { transform: translateY(1px); }
+
+    /* Mobile Menu Items */
+    .burger, .sheet, #menu { display: none; }
+
+    /* Hero */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: calc(var(--hero-gap) * var(--vu));
+      padding-bottom: calc(4 * var(--vu));
+    }
+
+    .h1 {
+      font-family: var(--font-display);
+      font-size: calc(var(--h1-fs) * var(--u));
+      font-weight: var(--w-display);
+      line-height: 1.10;
+      letter-spacing: var(--display-ls);
+      color: #fff;
+      font-variation-settings: "opsz" 32;
+      text-shadow: 0 calc(2 * var(--u)) calc(22 * var(--u)) rgba(0,0,0,.30);
+      text-align: center;
+    }
+
+    /* Composer */
+    .card {
+      width: calc(var(--card-w) * var(--u));
+      min-height: calc(var(--card-h) * var(--u));
+      border-radius: calc(var(--card-r) * var(--u));
+      margin-right: calc(3 * var(--u));
+      background: rgba(41, 41, 43, .955);
+      backdrop-filter: blur(calc(26 * var(--u))) saturate(112%);
+      -webkit-backdrop-filter: blur(calc(26 * var(--u))) saturate(112%);
+      box-shadow: inset 0 0 0 1px rgba(214, 228, 255, .14), 0 calc(22 * var(--u)) calc(60 * var(--u)) rgba(0,0,0,.30);
+      position: relative;
+      transition: min-height 0.4s var(--e-primary), border-radius 0.4s var(--e-primary);
+    }
+
+    .ph {
+      position: absolute;
+      left: calc(27 * var(--u));
+      top: calc(33 * var(--u));
+      right: calc(24 * var(--u));
+      color: #FFFFFF;
+      font-size: calc(var(--ph-fs) * var(--u));
+      font-weight: var(--w-body);
+      line-height: 1.35;
+      letter-spacing: var(--body-ls);
+      white-space: nowrap;
+      overflow: hidden;
+      outline: none;
+      background: transparent;
+      border: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    .ph.fade-out {
+      opacity: 0;
+    }
+
+    .ph::placeholder {
+      color: #8B8C8E;
+    }
+
+    /* Attachment Preview Badge */
+    .file-preview {
+      position: absolute;
+      left: calc(27 * var(--u));
+      top: calc(64 * var(--u));
+      display: inline-flex;
+      align-items: center;
+      gap: calc(6 * var(--u));
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: calc(3 * var(--u)) calc(8 * var(--u));
+      border-radius: calc(6 * var(--u));
+      font-size: calc(8.5 * var(--u));
+      color: #F49D70;
+    }
+    .file-preview .remove-file {
+      cursor: pointer;
+      color: #a9aaad;
+      font-weight: bold;
+      margin-left: calc(4 * var(--u));
+    }
+    .file-preview .remove-file:hover { color: #fff; }
+
+    .tools {
+      position: absolute;
+      left: calc(19 * var(--u));
+      top: calc(92 * var(--u));
+      height: calc(var(--chip-h) * var(--u));
+      right: calc(-1 * var(--u));
+    }
+
+    .chips {
+      display: flex;
+      align-items: center;
+      gap: calc(var(--chip-gap) * var(--u));
+    }
+
+    .chip {
+      height: calc(var(--chip-h) * var(--u));
+      border-radius: calc(var(--chip-r) * var(--u));
+      font-size: calc(var(--chip-fs) * var(--u));
+      font-weight: var(--w-label);
+      color: #909093;
+      line-height: 1;
+      background: linear-gradient(180deg, rgba(255,255,255,.088) 0%, rgba(255,255,255,.050) 45%, rgba(255,255,255,.038) 100%);
+      border: 1px solid rgba(255,255,255,.05);
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      width: calc(var(--cw) * var(--u));
+      padding-left: calc(var(--pl) * var(--u));
+      gap: calc(var(--ig) * var(--u));
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .chip:hover {
+      background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.07));
+      color: #c8c8cb;
+    }
+    .chip.active-chip {
+      background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.12));
+      border-color: rgba(248, 178, 133, 0.6);
+      color: #ffffff;
+    }
+    .chip span { transform: translateY(calc(2 * var(--u))); }
+    .chip svg { fill: currentColor; }
+
+    .right {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .right > * {
+      position: absolute;
+      pointer-events: auto;
+    }
+
+    .attach {
+      left: calc(599.15 * var(--u));
+      top: calc(10.14 * var(--u));
+      color: #A9AAAD;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .attach:hover { color: #fff; }
+    .attach svg { width: calc(19.79 * var(--u)); fill: currentColor; }
+
+    .send {
+      left: calc(640 * var(--u));
+      top: calc(2 * var(--u));
+      width: calc(var(--send-d) * var(--u));
+      height: calc(var(--send-d) * var(--u));
+      border-radius: 50%;
+      background: linear-gradient(163deg, #FBBC94 0%, #F49D70 46%, #E88654 100%);
+      box-shadow: 0 calc(3 * var(--u)) calc(12 * var(--u)) rgba(210,110,60,.34);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: filter 0.15s, transform 0.15s, opacity 0.15s;
+    }
+    .send svg { width: calc(11.66 * var(--u)); fill: #fff; }
+    .send:hover { filter: brightness(1.07); }
+    .send:active { transform: scale(.95); }
+
+    .spinner {
+      width: calc(14 * var(--u));
+      height: calc(14 * var(--u));
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* DROPDOWN ANSWER CONTAINER */
+    .answer-dropdown {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.45s var(--e-primary);
+      width: 100%;
+      margin-top: calc(143 * var(--u));
+    }
+
+    .answer-dropdown.open {
+      grid-template-rows: 1fr;
+    }
+
+    .answer-inner {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .answer-content {
+      padding: calc(18 * var(--u)) calc(27 * var(--u)) calc(24 * var(--u));
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: calc(10 * var(--u));
+      line-height: 1.55;
+      color: rgba(255, 255, 255, 0.9);
+      max-height: calc(320 * var(--u));
+      overflow-y: auto;
+      font-family: var(--font-text);
+    }
+
+    .answer-content::-webkit-scrollbar {
+      width: 4px;
+    }
+    .answer-content::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    /* Markdown Formatted Elements */
+    .answer-content h1, .answer-content h2, .answer-content h3 {
+      color: #fff;
+      margin: calc(12 * var(--u)) 0 calc(6 * var(--u));
+      font-weight: 600;
+    }
+    .answer-content h2 { font-size: calc(12 * var(--u)); }
+    .answer-content h3 { font-size: calc(10.8 * var(--u)); }
+    .answer-content p { margin-bottom: calc(8 * var(--u)); }
+    .answer-content ul, .answer-content ol {
+      margin: calc(6 * var(--u)) 0 calc(8 * var(--u)) calc(16 * var(--u));
+    }
+    .answer-content li { margin-bottom: calc(4 * var(--u)); }
+    .answer-content hr {
+      border: 0;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      margin: calc(12 * var(--u)) 0;
+    }
+    .answer-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: calc(10 * var(--u)) 0;
+      font-size: calc(9 * var(--u));
+    }
+    .answer-content th, .answer-content td {
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: calc(6 * var(--u)) calc(8 * var(--u));
+      text-align: left;
+    }
+    .answer-content th {
+      background: rgba(255,255,255,0.06);
+      color: #F49D70;
+    }
+
+    .answer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: calc(6 * var(--u));
+      font-size: calc(8.5 * var(--u));
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #F49D70;
+      margin-bottom: calc(8 * var(--u));
+    }
+
+    /* Footer */
+    .proof {
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: calc(52.3 * var(--vu));
+    }
+    .proof p {
+      font-family: var(--font-display);
+      font-size: calc(var(--by-fs) * var(--u));
+      font-weight: var(--w-proof);
+      letter-spacing: var(--proof-ls);
+      color: rgba(255,255,255,.95);
+      font-variation-settings: "opsz" 32;
+      text-shadow: 0 calc(1 * var(--u)) calc(12 * var(--u)) rgba(0,0,0,.35);
+    }
+    .logos {
+      display: flex;
+      align-items: center;
+      gap: calc(var(--logo-gap) * var(--u));
+    }
+    .logos svg {
+      fill: currentColor;
+      color: #fff;
+      filter: drop-shadow(0 calc(1 * var(--u)) calc(10 * var(--u)) rgba(0,0,0,.30));
+    }
+
+    /* Tablet responsive */
+    @media (min-width: 600px) and (max-width: 1180px) and (min-height: 600px) {
+      :root { --u: 1px; }
+      .frame { padding: clamp(24px, 3.4vh, 44px) clamp(28px, 4.2vw, 60px) clamp(26px, 4.4vh, 56px); }
+      .h1 { font-size: clamp(27px, 4.3vw, 44px); line-height: 1.12; }
+      .nav { height: 90px; }
+      .brand img { height: clamp(75px, 9.5vw, 110px); }
+      .card {
+        width: min(100%, clamp(516px, 74vw, 760px));
+        min-height: auto;
+        margin-right: 0;
+        padding: clamp(15px, 1.9vw, 24px);
+        border-radius: clamp(17px, 2.1vw, 26px);
+        display: flex;
+        flex-direction: column;
+        gap: clamp(20px, 3.2vh, 44px);
+      }
+      .ph {
+        position: static;
+        white-space: normal;
+        font-size: clamp(11px, 1.35vw, 14px);
+        line-height: 1.4;
+      }
+      .file-preview { position: static; margin-top: 4px; }
+      .tools {
+        position: static;
+        height: auto;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: clamp(10px, 1.4vw, 18px);
+      }
+      .chips {
+        flex-wrap: nowrap;
+        gap: clamp(6px, 0.85vw, 10px);
+      }
+      .chip {
+        width: auto;
+        height: clamp(29px, 3.4vh, 34px);
+        padding: 0 clamp(7px, 1vw, 13px);
+        font-size: clamp(9.6px, 1.12vw, 12.5px);
+      }
+      .chip span { transform: none; }
+      
+      .right {
+        position: static;
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+        gap: 0;
+      }
+      .right > * { position: static; }
+      .attach { margin-left: clamp(9px, 1.4vw, 20px); }
+      .send {
+        margin-left: clamp(9px, 1.3vw, 18px);
+        width: clamp(32px, 3.5vw, 38px);
+        height: clamp(32px, 3.5vw, 38px);
+      }
+      .answer-dropdown { margin-top: 0; }
+      .answer-content { font-size: clamp(11px, 1.3vw, 14px); max-height: 250px; }
+      .proof { gap: clamp(15px, 2.5vh, 30px); }
+    }
+
+    /* Compact / Phone Responsive */
+    @media (max-width: 599px), (max-height: 599px) and (max-width: 1180px) {
+      :root { --u: 1px; }
+      .frame {
+        padding:
+          max(18px, env(safe-area-inset-top))
+          max(clamp(18px, 5.2vw, 40px), env(safe-area-inset-right))
+          max(20px, env(safe-area-inset-bottom))
+          max(clamp(18px, 5.2vw, 40px), env(safe-area-inset-left));
+      }
+      .cta { display: none; }
+      .nav { height: 75px; }
+      .brand img { height: 70px; }
+      
+      /* Burger Menu */
+      .burger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        background: rgba(255,255,255,.10);
+        border: 1px solid rgba(255,255,255,.14);
+        cursor: pointer;
+        z-index: 10;
+      }
+      .burger svg { width: 17px; height: 12px; fill: #fff; }
+      #menu:checked ~ .sheet { grid-template-rows: 1fr; }
+      #menu:checked ~ .sheet > div { padding: 16px; border: 1px solid rgba(255,255,255,.09); margin-top: 10px; }
+      .sheet {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.32s cubic-bezier(.4,0,.2,1);
+        width: 100%;
+      }
+      .sheet > div {
+        overflow: hidden;
+        background: rgba(24,24,27,.86);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        border: 0px solid transparent;
+        padding: 0 16px;
+      }
+      .sheet .mob-cta {
+        height: 40px;
+        border-radius: 11px;
+        background: #fff;
+        color: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+      }
+
+      .h1 {
+        width: 100%;
+        max-width: 17ch;
+        font-size: clamp(27px, 7.2vw, 46px);
+        line-height: 1.14;
+        letter-spacing: -.012em;
+      }
+      .card {
+        width: 100%;
+        max-width: 600px;
+        min-height: auto;
+        flex-direction: column;
+        gap: clamp(16px, 4.6vh, 34px);
+        padding: clamp(13px, 3.4vw, 18px);
+        display: flex;
+      }
+      .ph {
+        position: static;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-size: clamp(9.4px, 2.95vw, 14px);
+      }
+      .file-preview { position: static; margin-top: 4px; }
+      .tools {
+        position: static;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        height: auto;
+      }
+      .chips { flex-wrap: wrap; gap: 8px; }
+      .chip {
+        width: auto;
+        height: 32px;
+        padding: 0 12px;
+        font-size: 11px;
+      }
+      .chip span { transform: none; }
+      .right {
+        position: static;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+      .right > * { position: static; }
+      .attach { margin-left: auto; }
+      .send {
+        margin-left: 14px;
+        width: 40px;
+        height: 40px;
+      }
+      .answer-dropdown { margin-top: 0; }
+      .answer-content { font-size: 12px; max-height: 200px; padding: 12px 0 4px; }
+      .proof p { font-size: 12px; }
+      .logos svg { height: 16px; width: auto; }
+    }
+
+    @media (max-width: 1180px) and (max-height: 560px) {
+      .hero { gap: 16px; }
+      .h1 { font-size: clamp(24px, 5.4vh, 34px); }
+      .proof { gap: 10px; }
+      .frame { padding-top: 10px; }
+    }
+
+    /* Animations */
+    @media (prefers-reduced-motion: no-preference) {
+      @keyframes e-settle-down { 0% { opacity: 0; transform: translateY(-calc(5 * var(--u))); } 100% { opacity: 1; transform: none; } }
+      @keyframes e-settle-up { 0% { opacity: 0; transform: translateY(calc(6 * var(--u))); } 100% { opacity: 1; transform: none; } }
+      @keyframes e-focus { 0% { opacity: 0; transform: translateY(calc(14 * var(--u))); filter: blur(calc(6 * var(--u))); } 100% { opacity: 1; transform: none; filter: blur(0); } }
+      @keyframes e-panel { 0% { opacity: 0; transform: translateY(calc(18 * var(--u))) scale(.985); } 100% { opacity: 1; transform: none; } }
+      @keyframes e-populate { 0% { opacity: 0; transform: translateY(calc(4 * var(--u))); } 100% { opacity: 1; transform: none; } }
+      @keyframes e-send { 0% { transform: scale(.82); } 100% { transform: none; } }
+
+      html.anim .brand { animation: e-settle-down 0.58s var(--e-soft) 0.06s both; }
+      html.anim .cta { animation: e-settle-down 0.55s var(--e-soft) 0.34s both; }
+      html.anim .h1 { animation: e-focus 1.00s var(--e-primary) 0.30s both; will-change: transform, opacity, filter; }
+      html.anim .card { animation: e-panel 0.90s var(--e-primary) 0.62s both; will-change: transform, opacity; }
+      html.anim .ph { animation: e-populate 0.50s var(--e-soft) 0.88s both; }
+      html.anim .chips { animation: e-populate 0.50s var(--e-soft) 0.94s both; }
+      html.anim .right { animation: e-populate 0.50s var(--e-soft) 1.00s both; }
+      html.anim .send { animation: e-send 0.50s var(--e-primary) 1.00s both; }
+      html.anim .proof p { animation: e-settle-up 0.55s var(--e-soft) 1.08s both; }
+      html.anim .logos svg:nth-child(1) { animation: e-settle-up 0.55s var(--e-soft) 1.16s both; }
+      html.anim .logos svg:nth-child(2) { animation: e-settle-up 0.55s var(--e-soft) 1.22s both; }
+      html.anim .logos svg:nth-child(3) { animation: e-settle-up 0.55s var(--e-soft) 1.28s both; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .anim * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <video class="stage-video" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260826_124724_bc041163-d651-425f-aea3-2acc1efc2c96.mp4" autoplay muted loop playsinline></video>
+    <div class="frame">
+      <input type="checkbox" id="menu">
+      <header class="nav">
+        <!-- Rebranded Large Logo -->
+        <div class="brand" aria-label="OmniSight Analytics Home">
+          <img src="logo.png" alt="OmniSight Analytics Logo">
+        </div>
+        <button class="cta"><span>Get Started</span></button>
+        <label for="menu" class="burger" aria-label="Toggle menu">
+          <svg viewBox="0 0 17 12" xmlns="http://www.w3.org/2000/svg">
+            <rect width="17" height="2" rx="1"/>
+            <rect y="10" width="17" height="2" rx="1"/>
+          </svg>
+        </label>
+      </header>
+      <div class="sheet">
+        <div>
+          <a href="#" class="mob-cta">Get Started</a>
+        </div>
+      </div>
+      <main class="hero">
+        <h1 class="h1">Analyze your market. We'll assist it.</h1>
+        <form class="card" id="composerForm" onsubmit="return false">
+          <input type="text" class="ph" id="promptInput" placeholder="Analyze competitor financial metrics..." autocomplete="off">
+          
+          <div class="file-preview" id="filePreview" style="display: none;">
+            <span id="fileName">file.txt</span>
+            <span class="remove-file" id="removeFileBtn">&times;</span>
+          </div>
+
+          <input type="file" id="fileInput" style="display: none;" accept=".pdf,.txt,.csv,.md,.json">
+
+          <div class="tools">
+            <div class="chips">
+              <button class="chip active-chip" id="chipDetailed" style="--cw: 120; --pl: 12; --ig: 3.7;" type="button">
+                <svg viewBox="0 0 16 16" style="width: calc(15.06 * var(--u));"><path d="M2 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H2zm2.5 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm-2 5l3-3.5 2 2.5 3.5-4.5 3 5.5h-11z"/></svg>
+                <span>Detailed Report</span>
+              </button>
+              <button class="chip" id="chipSwot" style="--cw: 115; --pl: 14; --ig: 3.9;" type="button">
+                <svg viewBox="0 0 12 16" style="width: calc(11.8 * var(--u));"><path d="M6 8a2 2 0 0 1-2-2V4a2 2 0 1 1 4 0v2a2 2 0 0 1-2 2zm0 0a2 2 0 0 0 2 2h2a2 2 0 1 0 0-4H8a2 2 0 0 0-2 2zm0 0a2 2 0 0 1-2 2v2a2 2 0 1 0 4 0v-2a2 2 0 0 1-2-2zm0 4a2 2 0 1 1-2-2v2a2 2 0 0 1 2 0z"/></svg>
+                <span>SWOT Analysis</span>
+              </button>
+              <button class="chip" id="chipTable" style="--cw: 118; --pl: 12; --ig: 2.9;" type="button">
+                <svg viewBox="0 0 16 16" style="width: calc(12.13 * var(--u));"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 2v10a5 5 0 0 1 0-10z"/></svg>
+                <span>Tabular Report</span>
+              </button>
+            </div>
+            <div class="right">
+              <button class="attach" id="attachBtn" type="button" aria-label="Attach file">
+                <svg viewBox="0 0 20 20"><path d="M10.833 3.333v9.584c0 1.265-.985 2.291-2.25 2.291-1.264 0-2.25-1.026-2.25-2.291V4.583c0-2.07 1.68-3.75 3.75-3.75 2.071 0 3.75 1.68 3.75 3.75v8.75c0 2.875-2.333 5.208-5.208 5.208-2.876 0-5.208-2.333-5.208-5.208V5.833h1.666v7.5c0 1.954 1.588 3.542 3.542 3.542 1.954 0 3.542-1.588 3.542-3.542v-8.75c0-1.15-.933-2.083-2.084-2.083-1.15 0-2.083.933-2.083 2.083v8.334c0 .345.28.625.625.625.346 0 .625-.28.625-.625V3.333h1.667z"/></svg>
+              </button>
+              <button class="send" id="sendBtn" type="button" aria-label="Build it">
+                <svg id="sendIcon" viewBox="0 0 12 14"><path d="M6 0L0 6h4v8h4V6h4L6 0z"/></svg>
+                <div id="sendSpinner" class="spinner" style="display: none;"></div>
+              </button>
+            </div>
+          </div>
+
+          <div class="answer-dropdown" id="answerDropdown">
+            <div class="answer-inner">
+              <div class="answer-content">
+                <div class="answer-badge">
+                  <svg viewBox="0 0 12 12" style="width: calc(10 * var(--u)); height: calc(10 * var(--u)); fill: currentColor;">
+                    <circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M4 6l1.5 1.5L8 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                  Generated Report
+                </div>
+                <div id="answerText">Submit a prompt to view the analysis report.</div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </main>
+      <footer class="proof">
+        <p>Built by engineers from</p>
+        <div class="logos">
+          <svg viewBox="0 0 97 32" style="width: calc(96.84 * var(--u));"><path d="M12.6 24.8c-6.8 0-12.4-5.4-12.4-12.4S5.8 0 12.6 0c3.7 0 6.9 1.4 9.3 3.7l-2.6 2.6c-1.8-1.7-4.1-2.7-6.7-2.7-5.1 0-9.3 4.2-9.3 9.4 0 5.2 4.2 9.4 9.3 9.4 4.5 0 7.3-2 9-3.7 1.4-1.4 2.3-3.4 2.6-6.1h-11.6v-3.7h15.2c.1.6.2 1.4.2 2.2 0 2.6-.8 6.1-3.1 8.5-2.2 2.5-5.3 3.9-9.1 3.9zm20.8-8.2c0-4.6-3.6-8.2-8.2-8.2-4.6 0-8.2 3.6-8.2 8.2s3.6 8.2 8.2 8.2c4.6 0 8.2-3.6 8.2-8.2zm-3.6 0c0 2.9-2 5-4.6 5s-4.6-2.1-4.6-5 2-5 4.6-5 4.6 2.1 4.6 5zm21-8.2c0-4.6-3.6-8.2-8.2-8.2-4.6 0-8.2 3.6-8.2 8.2s3.6 8.2 8.2 8.2c4.6 0 8.2-3.6 8.2-8.2zm-3.6 0c0 2.9-2 5-4.6 5s-4.6-2.1-4.6-5 2-5 4.6-5 4.6 2.1 4.6 5zm20.5 1.5v-1.3c0-4.2-3.4-7.5-7.8-7.5-4.4 0-8 3.5-8 8.2 0 4.6 3.6 8.2 8.1 8.2 3.7 0 6.1-2.3 7.2-5.4l-3.1-1.3c-.8 1.9-2.2 3-4.1 3-2.3 0-3.6-1.1-4.3-3.2l11.9-4.9h.1zm-12.1-1.2c0-2.8 2.2-4.5 4.2-4.5 1.7 0 3 .9 3.5 2.1l-7.7 3.2zm-6.2 14.8h3.6V1.1h-3.6v23.5zm-15.6-3.9h-.1c-.8 1-2.4 1.8-4.2 1.8-4 0-7.6-3.6-7.6-8.2 0-4.6 3.6-8.2 7.6-8.2 1.8 0 3.3.8 4.2 1.8h.1v-1.1c0-3.1-1.6-4.8-4.1-4.8-2.1 0-3.5 1.5-4 2.8l-3.1-1.3c1-2.2 3.2-4.8 7.2-4.8 4.1 0 7.7 2.4 7.7 8.5v11.9h-3.5v-1.4zm-3.9-10.9c2.6 0 4.6 2.2 4.6 5s-2 5-4.6 5c-2.7 0-4.7-2.2-4.7-5s2-5 4.7-5z"/></svg>
+          <svg viewBox="0 0 68 32" style="width: calc(67.29 * var(--u));"><path d="M3 13h3v10H3zm6 0h3v12H9zm6-2h3v14h-3zm6-2h3v16h-3zm6-4h3v20h-3zm6 6h3v14h-3zm6 4h3v10h-3zm6-2h3v12h-3zm6 2h3v10h-3zm6-5h3v15h-3zm6 3h3v12h-3z"/></svg>
+          <svg viewBox="0 0 89 32" style="width: calc(88.68 * var(--u));"><path d="M19 0L0 32h11l3-8h15l3 8h10L19 0zm-2 17l6-13 5 13h-11z M52 0h-9v32h14c7 0 13-6 13-13S61 0 52 0zm0 25h-5V7h6c4 0 7 3 7 8s-3 10-8 10z M89 0H74v32h15v-7h-8v-5h7v-7h-7V7h8z"/></svg>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // Entrance Animations
+    document.documentElement.classList.add('anim');
+    const animElements = document.querySelectorAll('.logos svg');
+    if (animElements.length > 0) {
+      const lastAnim = animElements[animElements.length - 1];
+      let hasRemoved = false;
+      const removeAnim = () => {
+        if (hasRemoved) return;
+        hasRemoved = true;
+        document.documentElement.classList.remove('anim');
+      };
+      lastAnim.addEventListener('animationend', removeAnim);
+      setTimeout(removeAnim, 2600);
+    } else {
+      setTimeout(() => document.documentElement.classList.remove('anim'), 2600);
+    }
+
+    // Dynamic Rotating Placeholder Array
+    const placeholderTexts = [
+      "Analyze competitor financial metrics...",
+      "Upload a PDF for instant SWOT analysis...",
+      "Ask a strategic market question..."
+    ];
+    let placeholderIdx = 0;
+    const promptInput = document.getElementById('promptInput');
+
+    // Cycle placeholders every 3.5 seconds with a smooth opacity fade
+    setInterval(() => {
+      if (promptInput.value.length > 0) return;
+
+      promptInput.classList.add('fade-out');
+      setTimeout(() => {
+        placeholderIdx = (placeholderIdx + 1) % placeholderTexts.length;
+        promptInput.placeholder = placeholderTexts[placeholderIdx];
+        promptInput.classList.remove('fade-out');
+      }, 300);
+    }, 3500);
+
+    // Attachment File Elements
+    const attachBtn = document.getElementById('attachBtn');
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+    const fileNameSpan = document.getElementById('fileName');
+    const removeFileBtn = document.getElementById('removeFileBtn');
+
+    attachBtn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) {
+        fileNameSpan.textContent = fileInput.files[0].name;
+        filePreview.style.display = 'inline-flex';
+      }
+    });
+
+    removeFileBtn.addEventListener('click', () => {
+      fileInput.value = '';
+      filePreview.style.display = 'none';
+    });
+
+    // Interactive Tab Parsing and State
+    let parsedReport = {
+      detailed: "No report generated yet.",
+      swot: "No SWOT analysis available.",
+      table: "No tabular data available."
+    };
+
+    const chipDetailed = document.getElementById('chipDetailed');
+    const chipSwot = document.getElementById('chipSwot');
+    const chipTable = document.getElementById('chipTable');
+    const answerText = document.getElementById('answerText');
+    const answerDropdown = document.getElementById('answerDropdown');
+
+    function setActiveTab(selectedChip, contentType) {
+      [chipDetailed, chipSwot, chipTable].forEach(c => c.classList.remove('active-chip'));
+      selectedChip.classList.add('active-chip');
+      
+      const markdownContent = parsedReport[contentType];
+      answerText.innerHTML = typeof marked !== 'undefined' ? marked.parse(markdownContent) : markdownContent;
+    }
+
+    chipDetailed.addEventListener('click', () => setActiveTab(chipDetailed, 'detailed'));
+    chipSwot.addEventListener('click', () => setActiveTab(chipSwot, 'swot'));
+    chipTable.addEventListener('click', () => setActiveTab(chipTable, 'table'));
+
+    function parseReportData(rawReport) {
+      if (typeof rawReport !== 'string') return;
+
+      const execSummary = rawReport.match(/(?:##\s*(?:1\.)?\s*Executive Summary|Executive Summary)[\s\S]*?(?=(?:##\s*(?:2\.|[A-Z])|SWOT|Data Table|$))/i);
+      const recs = rawReport.match(/(?:##\s*(?:4\.|[A-Z])?\s*Strategic Recommendation[s]?|Strategic Recommendations)[\s\S]*/i);
+      
+      parsedReport.detailed = (execSummary ? execSummary[0] : '') + '\n\n' + (recs ? recs[0] : rawReport);
+
+      const swotMatch = rawReport.match(/(?:##\s*(?:3\.|[A-Z])?\s*SWOT Analysis|SWOT Analysis)[\s\S]*?(?=(?:##\s*(?:4\.|[A-Z])?\s*Strategic Recommendation|$))/i);
+      parsedReport.swot = swotMatch ? swotMatch[0] : "### SWOT Analysis\n" + (rawReport.includes("Strengths") ? rawReport : "No SWOT section found.");
+
+      const tableMatch = rawReport.match(/(?:##\s*(?:2\.|[A-Z])?\s*(?:Data Table|Market[- ]Risk Snapshot)|Data Table)[\s\S]*?(?=(?:##\s*(?:3\.|[A-Z])?\s*SWOT Analysis|$))/i);
+      parsedReport.table = tableMatch ? tableMatch[0] : "### Data Table\n" + (rawReport.includes("|") ? rawReport : "No tabular data found.");
+    }
+
+    // Backend Execution with Extended 60-Second Timeout for Live Scraping
+    const sendBtn = document.getElementById('sendBtn');
+    const sendIcon = document.getElementById('sendIcon');
+    const sendSpinner = document.getElementById('sendSpinner');
+    const composerForm = document.getElementById('composerForm');
+
+    async function handleSend() {
+      const text = promptInput.value.trim();
+      const hasFile = fileInput.files.length > 0;
+
+      if (!text && !hasFile) return;
+
+      answerDropdown.classList.remove('open');
+      sendBtn.style.pointerEvents = 'none';
+      sendIcon.style.display = 'none';
+      sendSpinner.style.display = 'block';
+
+      // Live loading status message to prevent user drop-off during first-time live web scraping
+      answerText.innerHTML = "<p style='color:#F49D70;'>Initiating live market research & agentic report compilation (this may take 10-15 seconds on first query)...</p>";
+      answerDropdown.classList.add('open');
+
+      const formData = new FormData();
+      formData.append('prompt', text);
+      if (hasFile) {
+        formData.append('file', fileInput.files[0]);
+      }
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+        const response = await fetch('http://127.0.0.1:8000/api/chat', {
+          method: 'POST',
+          body: formData,
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        const data = await response.json();
+        const rawOutput = data.reply || data.report || "No output generated.";
+
+        parseReportData(rawOutput);
+        setActiveTab(chipDetailed, 'detailed');
+        answerDropdown.classList.add('open');
+
+        fileInput.value = '';
+        filePreview.style.display = 'none';
+
+      } catch (error) {
+        console.error('Failed to process request:', error);
+        if (error.name === 'AbortError') {
+          answerText.innerHTML = "<p style='color:#f87171;'>Request timed out during live scraping. Try clicking send again now that data is cached.</p>";
+        } else {
+          answerText.innerHTML = "<p style='color:#f87171;'>Error connecting to backend server. Ensure main.py is running on port 8000.</p>";
+        }
+        answerDropdown.classList.add('open');
+      } finally {
+        sendBtn.style.pointerEvents = 'auto';
+        sendIcon.style.display = 'block';
+        sendSpinner.style.display = 'none';
+      }
+    }
+
+    sendBtn.addEventListener('click', handleSend);
+    composerForm.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSend();
+      }
+    });
+  </script>
+</body>
+</html>
